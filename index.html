@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnOva - Earn Rewards</title>
+    <script src='//libtl.com/sdk.js' data-zone='9798556' data-sdk='show_9798556'></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2AABEE; /* Telegram Blue */
+            --primary-dark: #1F98D5;
+            --background-color: #121212;
+            --surface-color: #1e1e1e;
+            --surface-light: #2c2c2c;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent-gold: #FFD700;
+        }
+
+        /* Existing Main App Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        .dark-bg {
+            background-color: #121212;
+        }
+        .card-bg {
+            background-color: #1e1e1e;
+        }
+        .border-accent {
+            border-color: #4a7c59;
+        }
+        .text-accent {
+            color: #4a7c59;
+        }
+        .btn, .btn-accent, .btn-outline-accent {
+            transition: all 0.2s ease-in-out;
+            transform: scale(1);
+        }
+        .btn:active, .btn-accent:active, .btn-outline-accent:active {
+            transform: scale(0.95);
+        }
+        .btn-accent {
+            background-color: #4a7c59;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-accent:hover {
+            background-color: #345635;
+        }
+        .btn-outline-accent {
+            border: 1px solid #4a7c59;
+            color: #4a7c59;
+        }
+        .btn-outline-accent:hover {
+            background-color: #4a7c59;
+            color: white;
+        }
+        .input-field {
+            background-color: #2c2c2c;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            width: 100%;
+        }
+        .main-page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .main-page.active {
+            display: flex;
+            opacity: 1;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .sub-page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .sub-page.active {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .bottom-nav a.active {
+            color: #4a7c59;
+        }
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #121212;
+            display: none;
+        }
+        .reward-card {
+            background: linear-gradient(135deg, #345635 0%, #4a7c59 100%);
+            color: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        .withdrawal-status-pending {
+            color: #fbbf24;
+        }
+        .withdrawal-status-approved {
+            color: #10b981;
+        }
+        .withdrawal-status-rejected {
+            color: #ef4444;
+        }
+        .method-option {
+            background-color: #2c2c2c;
+            border: 1px solid #444;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .method-option.selected {
+            border: 2px solid #4a7c59;
+            background-color: #34563520;
+        }
+        .method-option:hover {
+            background-color: #3a3a3a;
+        }
+        .payment-details {
+            display: none;
+        }
+        .payment-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(18, 18, 18, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #4a7c59;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .support-section {
+            background-color: #2c2c2c;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        .task-icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+        
+        /* Ad loading styles */
+        #ad-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+        .ad-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #4a7c59;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        /* Color Match Challenge Game Styles */
+        .color-match-container {
+            width: 100%;
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 1rem 0;
+            position: relative;
+        }
+        .color-match-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4a7c59;
+            color: white;
+        }
+        .color-match-stats {
+            display: flex;
+            gap: 15px;
+        }
+        .color-match-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .color-match-stat-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .color-match-stat-label {
+            font-size: 12px;
+        }
+        .color-match-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 15px;
+            background-color: #2c2c2c;
+        }
+        .color-match-tile {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .color-match-tile:hover {
+            transform: scale(1.05);
+        }
+        .color-match-tile.selected {
+            transform: scale(0.9);
+            box-shadow: 0 0 0 3px gold;
+        }
+        .color-match-tile.matched {
+            opacity: 0.2;
+            transform: scale(0.9);
+        }
+        .color-match-controls {
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            background-color: #2c2c2c;
+        }
+        .color-match-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #4a7c59;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .color-match-btn:hover {
+            transform: translateY(-2px);
+        }
+        .color-match-btn:active {
+            transform: translateY(0);
+        }
+        .color-match-game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            display: none;
+            z-index: 100;
+        }
+        .color-match-game-over h2 {
+            margin-bottom: 15px;
+            font-size: 28px;
+            color: gold;
+        }
+        .color-match-game-over p {
+            margin: 8px 0;
+            font-size: 18px;
+        }
+        .color-match-instructions {
+            padding: 10px;
+            text-align: center;
+            background-color: #2c2c2c;
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        /* NEW OFFER PAGE STYLES */
+        .offers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        .offer-card {
+            background: var(--surface-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #333;
+        }
+        .offer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+        }
+        .offer-banner {
+            height: 100px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background: linear-gradient(to right, #0088cc, #2AABEE);
+        }
+        .offer-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .offer-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .offer-reward {
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        .offer-reward i {
+            margin-right: 5px;
+        }
+        .offer-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+        .offer-link {
+            display: block;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        .offer-link:hover {
+            background: var(--primary-dark);
+        }
+        .offer-footer {
+            padding: 10px 20px;
+            background: var(--surface-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .tag {
+            background: #444;
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body class="max-w-md mx-auto relative">
+    <div id="loader" class="flex items-center justify-center z-50">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="ad-loading">
+        <div class="ad-spinner"></div>
+        <p class="text-white text-lg">Loading offer...</p>
+    </div>
+
+    <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page">
+        <h1 class="text-4xl font-bold text-center mb-2 text-accent">EarnOva</h1>
+        <p class="text-center text-gray-400 mb-8">Continue earning rewards by logging in or signing up</p>
+        
+        <div id="auth-container">
+            <div id="login-view">
+                <input id="login-email" type="email" placeholder="Email" class="w-full p-3 rounded-lg input-field mb-2">
+                <div id="login-email-error" class="error-message"></div>
+                <input id="login-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-2">
+                <div id="login-password-error" class="error-message"></div>
+                <button id="login-btn" class="w-full p-3 rounded-lg btn-accent mb-4">Login</button>
+                <p class="text-center text-gray-400">No account? <a href="#" id="show-signup" class="font-semibold text-accent">Sign Up</a></p>
+            </div>
+            
+            <div id="signup-view" class="hidden">
+                <input id="signup-name" type="text" placeholder="Full Name" class="w-full p-3 rounded-lg input-field mb-2">
+                <div id="signup-name-error" class="error-message"></div>
+                <input id="signup-email" type="email" placeholder="Email" class="w-full p-3 rounded-lg input-field mb-2">
+                <div id="signup-email-error" class="error-message"></div>
+                <input id="signup-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-2">
+                <div id="signup-password-error" class="error-message"></div>
+                <input id="signup-referral" type="text" placeholder="Referral Code (Optional)" class="w-full p-3 rounded-lg input-field mb-2">
+                <div id="signup-referral-error" class="error-message"></div>
+                <button id="signup-btn" class="w-full p-3 rounded-lg btn-accent mb-4">Sign Up</button>
+                <p class="text-center text-gray-400">Already have an account? <a href="#" id="show-login" class="font-semibold text-accent">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="min-h-screen flex-col main-page">
+        <header class="flex items-center justify-between p-4 sticky top-0 bg-opacity-80 backdrop-blur-md z-10 dark-bg">
+            <h1 class="text-xl font-bold text-accent">EarnOva</h1>
+            <div class="flex items-center space-x-4">
+                <div id="notification-bell" class="relative cursor-pointer">
+                    <i data-lucide="bell" class="w-6 h-6"></i>
+                    <div id="notification-dot" class="notification-dot"></div>
+                </div>
+                <i data-lucide="user" class="w-6 h-6 cursor-pointer" onclick="navigateTo('profile-page')"></i>
+            </div>
+        </header>
+
+        <main class="flex-grow">
+            <div id="home-page" class="p-4 space-y-6 sub-page">
+                <div class="reward-card p-4 rounded-lg flex items-center justify-between">
+                    <div>
+                        <p class="text-white text-sm">Your Balance</p>
+                        <p class="text-3xl font-bold"><span id="coin-balance">0</span> Coins</p>
+                    </div>
+                    <button id="home-withdraw-btn" class="bg-white text-[#345635] font-semibold px-6 py-2 rounded-lg">Withdraw</button>
+                </div>
+
+                <section>
+                    <h2 class="text-lg font-semibold mb-4">Earning Opportunities</h2>
+                    <div class="space-y-3">
+                        <div class="reward-card p-3 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-3xl">🎲</span>
+                                <div>
+                                    <h3 class="font-bold"> Watch and Earn</h3>
+                                    <p class="text-xs font-medium">Earn 50 coins</p>
+                                </div>
+                            </div>
+                            <button class="bg-white text-[#345635] font-bold px-6 py-2 rounded-lg text-sm btn" onclick="claimReward('interstitial')">Watch</button>
+                        </div>
+                        
+                        <div class="card-bg p-3 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-3xl">🛸</span>
+                                <div>
+                                    <h3 class="font-semibold">Complete Offer</h3>
+                                    <p class="text-xs text-gray-400">Earn up to 2000 coins</p>
+                                </div>
+                            </div>
+                            <button id="complete-offer-btn" class="btn-accent font-bold px-6 py-2 rounded-lg text-sm btn" onclick="navigateTo('offers-page')">Open</button>
+                        </div>
+                        
+                        <div class="card-bg p-3 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-3xl">🎮</span>
+                                <div>
+                                    <h3 class="font-semibold">Play Game</h3>
+                                    <p class="text-xs text-gray-400">Earn Upto 3000 coins</p>
+                                </div>
+                            </div>
+                            <button class="btn-accent font-bold px-6 py-2 rounded-lg text-sm btn" onclick="navigateTo('game-page')">Play</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-semibold mb-4">Tasks</h2>
+                    <div class="space-y-3">
+                        <div class="card-bg p-3 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-3xl">🏆</span>
+                                <div>
+                                    <h3 class="font-semibold">Earnova Official</h3>
+                                    <p class="text-xs text-gray-400">Join our official channel</p>
+                                    <p class="text-xs text-gray-400">Earn 500 coins</p>
+                                </div>
+                            </div>
+                            <button class="btn-accent font-bold px-6 py-2 rounded-lg text-sm btn" onclick="completeTask('official')">Join</button>
+                        </div>
+                        
+                        <div class="card-bg p-3 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-3xl">📰</span>
+                                <div>
+                                    <h3 class="font-semibold">Partner 1</h3>
+                                    <p class="text-xs text-gray-400">Join our partner channel</p>
+                                    <p class="text-xs text-gray-400">Earn 100 coins</p>
+                                </div>
+                            </div>
+                            <button class="btn-accent font-bold px-6 py-2 rounded-lg text-sm btn" onclick="completeTask('partner1')">Join</button>
+                        </div>
+                        
+                        <div class="card-bg p-3 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-3xl">🎁</span>
+                                <div>
+                                    <h3 class="font-semibold">Partner 2</h3>
+                                    <p class="text-xs text-gray-400">Join our partner channel</p>
+                                    <p class="text-xs text-gray-400">Earn 200 coins</p>
+                                </div>
+                            </div>
+                            <button class="btn-accent font-bold px-6 py-2 rounded-lg text-sm btn" onclick="completeTask('partner2')">Join</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="offers-page" class="p-4 space-y-6 sub-page">
+                <header>
+                    <h1>Offer Hub</h1>
+                    <p class="subtitle">Complete simple tasks, unlock amazing rewards!</p>
+                </header>
+
+                <div class="offers-container">
+                    <div class="offer-card">
+                        <div class="offer-banner"><i class="fab fa-telegram-plane"></i></div>
+                        <div class="offer-content">
+                            <h3 class="offer-title">Join Our Official Channel</h3>
+                            <div class="offer-reward"><i class="fas fa-coins"></i> 500 Coins</div>
+                            <p class="offer-description">Be the first to get official announcements, news, and special offers. Join our main channel to stay connected!</p>
+                            <a href="https://tpi.li/sFDQku74nZz" target="_blank" class="offer-link">Join Official Channel</a>
+                        </div>
+                        <div class="offer-footer">
+                            <span class="tag"><i class="far fa-clock"></i> ~5 min</span>
+                            <span class="tag">⭐ Essential</span>
+                        </div>
+                    </div>
+
+                    <div class="offer-card">
+                        <div class="offer-banner"><i class="fab fa-telegram-plane"></i></div>
+                        <div class="offer-content">
+                            <h3 class="offer-title">Get Help in Our Support Group</h3>
+                            <div class="offer-reward"><i class="fas fa-coins"></i> 500 Coins</div>
+                            <p class="offer-description">Have questions? Join our friendly support group to get help from the community and admins. Your reward awaits!</p>
+                            <a href="https://tpi.li/ziXh" target="_blank" class="offer-link">Join Support Group</a>
+                        </div>
+                        <div class="offer-footer">
+                            <span class="tag"><i class="far fa-clock"></i> ~5 min</span>
+                            <span class="tag">💬 Support</span>
+                        </div>
+                    </div>
+
+                    <div class="offer-card">
+                        <div class="offer-banner"><i class="fab fa-telegram-plane"></i></div>
+                        <div class="offer-content">
+                            <h3 class="offer-title">Explore Partner Channel #1</h3>
+                            <div class="offer-reward"><i class="fas fa-coins"></i> 500 Coins</div>
+                            <p class="offer-description">Discover exciting offers and content from our trusted partner. Join their channel for more ways to earn!</p>
+                            <a href="https://tpi.li/Grjizerli3K" target="_blank" class="offer-link">Join Partner</a>
+                        </div>
+                        <div class="offer-footer">
+                            <span class="tag"><i class="far fa-clock"></i> ~5 min</span>
+                            <span class="tag">🤝 Partner</span>
+                        </div>
+                    </div>
+
+                    <div class="offer-card">
+                        <div class="offer-banner"><i class="fab fa-telegram-plane"></i></div>
+                        <div class="offer-content">
+                            <h3 class="offer-title">Explore Partner Channel #2</h3>
+                            <div class="offer-reward"><i class="fas fa-coins"></i> 500 Coins</div>
+                            <p class="offer-description">Check out another one of our great partners! Join their Telegram channel to find new tasks and exclusive rewards.</p>
+                            <a href="https://tpi.li/c5UZD4P9tLi" target="_blank" class="offer-link">Join Partner</a>
+                        </div>
+                        <div class="offer-footer">
+                            <span class="tag"><i class="far fa-clock"></i> ~5 min</span>
+                            <span class="tag">🤝 Partner</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="game-page" class="p-4 space-y-6 sub-page">
+                <h2 class="text-xl font-bold text-center">Color Match Challenge</h2>
+                <p class="text-center text-gray-400">Match tiles of the same color to earn points and coins!</p>
+                
+                <div class="color-match-container">
+                    <div class="color-match-header">
+                        <h1>Color Match</h1>
+                        <div class="color-match-stats">
+                            <div class="color-match-stat">
+                                <div class="color-match-stat-value" id="color-match-score">0</div>
+                                <div class="color-match-stat-label">SCORE</div>
+                            </div>
+                            <div class="color-match-stat">
+                                <div class="color-match-stat-value" id="color-match-time">60</div>
+                                <div class="color-match-stat-label">TIME</div>
+                            </div>
+                            <div class="color-match-stat">
+                                <div class="color-match-stat-value" id="color-match-coins">0</div>
+                                <div class="color-match-stat-label">COINS</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="color-match-instructions">
+                        Match tiles of the same color to earn points and coins!
+                    </div>
+                    <div class="color-match-grid" id="color-match-grid"></div>
+                    <div class="color-match-controls">
+                        <button class="color-match-btn" id="color-match-start-btn">Start Game</button>
+                        <button class="color-match-btn" id="color-match-hint-btn">Hint</button>
+                        <button class="color-match-btn" id="color-match-restart-btn">Restart</button>
+                    </div>
+                    <div class="color-match-game-over" id="color-match-game-over">
+                        <h2>Game Over!</h2>
+                        <p>Final Score: <span id="color-match-final-score">0</span></p>
+                        <p>Coins Earned: <span id="color-match-final-coins">0</span></p>
+                        <p>Time Left: <span id="color-match-final-time">0</span>s</p>
+                        <button class="color-match-btn" id="color-match-play-again-btn">Play Again</button>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center mt-4">
+                    <button onclick="navigateTo('home-page')" class="btn-accent px-6 py-2 rounded-lg">Back to Home</button>
+                </div>
+            </div>
+
+            <div id="wallet-page" class="p-4 space-y-6 sub-page">
+                <h2 class="text-xl font-bold text-center">My Wallet</h2>
+                
+                <div class="card-bg p-4 rounded-lg">
+                    <h3 class="font-semibold mb-3">Withdraw Earnings</h3>
+                    <p class="text-sm text-gray-400 mb-1">Current Balance: <span class="font-bold text-accent"><span id="wallet-coin-balance">0</span> Coins</span></p>
+                    <p class="text-sm text-gray-400 mb-2">Minimum: <span id="min-withdrawal-info">5000</span> Coins</p>
+                    <p class="text-sm text-gray-400 mb-4 font-semibold" id="coin-value-info">1000 Coins = ₹10</p>
+                    
+                    <div class="mb-3">
+                        <label class="text-sm text-gray-400">Withdrawals Today: <span id="withdrawals-today">0</span>/3</label>
+                    </div>
+                    
+                    <input id="withdraw-amount" type="number" placeholder="Enter coin amount" class="w-full p-3 rounded-lg input-field mb-3">
+                    <div id="withdraw-amount-error" class="error-message"></div>
+                    
+                    <div class="mb-3">
+                        <label class="text-sm text-gray-400 mb-1 block">Select Withdrawal Method:</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="method-option" data-method="UPI">
+                                <i data-lucide="smartphone" class="w-6 h-6 mx-auto mb-1"></i>
+                                <span class="text-sm">UPI</span>
+                            </div>
+                            <div class="method-option" data-method="Paytm">
+                                <i data-lucide="credit-card" class="w-6 h-6 mx-auto mb-1"></i>
+                                <span class="text-sm">Paytm</span>
+                            </div>
+                            <div class="method-option" data-method="Binance">
+                                <i data-lucide="bitcoin" class="w-6 h-6 mx-auto mb-1"></i>
+                                <span class="text-sm">Binance</span>
+                            </div>
+                            <div class="method-option" data-method="Bank Transfer">
+                                <i data-lucide="banknote" class="w-6 h-6 mx-auto mb-1"></i>
+                                <span class="text-sm">Bank Transfer</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-method" value="">
+                        <div id="withdraw-method-error" class="error-message"></div>
+                    </div>
+                    
+                    <div id="upi-details" class="payment-details">
+                        <input id="upi-id" type="text" placeholder="Enter your UPI ID" class="w-full p-3 rounded-lg input-field mb-3">
+                        <div id="upi-id-error" class="error-message"></div>
+                    </div>
+                    
+                    <div id="paytm-details" class="payment-details">
+                        <input id="paytm-number" type="text" placeholder="Enter your Paytm number" class="w-full p-3 rounded-lg input-field mb-3">
+                        <div id="paytm-number-error" class="error-message"></div>
+                    </div>
+                    
+                    <div id="binance-details" class="payment-details">
+                        <input id="binance-id" type="text" placeholder="Enter your Binance ID" class="w-full p-3 rounded-lg input-field mb-3">
+                        <div id="binance-id-error" class="error-message"></div>
+                    </div>
+                    
+                    <div id="bank-transfer-details" class="payment-details">
+                        <input id="account-holder" type="text" placeholder="Account Holder Name" class="w-full p-3 rounded-lg input-field mb-3">
+                        <div id="account-holder-error" class="error-message"></div>
+                        <input id="account-number" type="text" placeholder="Account Number" class="w-full p-3 rounded-lg input-field mb-3">
+                        <div id="account-number-error" class="error-message"></div>
+                        <input id="ifsc-code" type="text" placeholder="IFSC Code" class="w-full p-3 rounded-lg input-field mb-3">
+                        <div id="ifsc-code-error" class="error-message"></div>
+                    </div>
+                    
+                    <button id="withdraw-btn" class="w-full p-3 rounded-lg btn-accent mt-3">Request Withdrawal</button>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Withdrawal History</h3>
+                    <div id="withdrawal-history-list" class="space-y-3">
+                        <p class="text-gray-400 text-center py-4">No withdrawal history yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="refer-page" class="p-4 space-y-6 sub-page">
+                <h2 class="text-xl font-bold text-center">Refer & Earn</h2>
+                
+                <div class="card-bg p-6 rounded-lg text-center">
+                    <p class="text-gray-400 mb-2">Your Referral Code</p>
+                    <div class="bg-gray-800 p-3 rounded-lg flex items-center justify-center mb-4">
+                        <span id="referral-code" class="text-2xl font-bold tracking-widest">--</span>
+                        <button id="copy-code-btn" class="ml-4"><i data-lucide="copy" class="w-6 h-6 text-gray-400"></i></button>
+                    </div>
+                    
+                    <p class="text-gray-400 mb-2 mt-4">Your Referral Link</p>
+                    <div class="bg-gray-800 p-3 rounded-lg flex items-center justify-center mb-4">
+                        <span id="referral-link" class="text-sm font-bold break-all">t.me/EarnovaCash_bot?start=ref_--</span>
+                        <button id="copy-link-btn" class="ml-4"><i data-lucide="copy" class="w-6 h-6 text-gray-400"></i></button>
+                    </div>
+                    
+                    <p class="text-sm text-gray-300 mb-4">Share your code with friends to earn <span class="text-accent font-bold">3000 coins</span> for each successful referral!</p>
+                    <p class="text-xs text-gray-400">You'll get 3000 coins when someone signs up using your code</p>
+                </div>
+                
+                <button id="share-btn" class="w-full p-3 rounded-lg btn-accent pulse">Share My Code</button>
+                
+                <div class="card-bg p-4 rounded-lg mt-6">
+                    <h3 class="font-semibold mb-3 text-center">Have a referral code?</h3>
+                    <input id="enter-referral-code" type="text" placeholder="Enter code here" class="w-full p-3 rounded-lg input-field mb-3">
+                    <div id="referral-code-error" class="error-message"></div>
+                    <button id="apply-referral-btn" class="w-full p-3 rounded-lg btn-outline-accent">Apply Code</button>
+                </div>
+            </div>
+
+            <div id="profile-page" class="p-4 space-y-6 sub-page">
+                <h2 class="text-xl font-bold text-center mb-4">Profile</h2>
+                
+                <div class="flex flex-col items-center">
+                    <div class="rounded-full bg-[#345635] w-24 h-24 flex items-center justify-center mb-4">
+                        <span id="user-initials" class="text-3xl text-white font-bold"> -- </span>
+                    </div>
+                    <h2 id="profile-name" class="text-xl font-bold">User Name</h2>
+                    <p id="profile-email" class="text-gray-400">user@email.com</p>
+                </div>
+                
+                <div class="card-bg p-4 rounded-lg mt-4">
+                    <h3 class="font-semibold mb-2">Account Details</h3>
+                    <p class="text-sm text-gray-400">Joined: <span id="join-date">--</span></p>
+                    <p class="text-sm text-gray-400 mt-2">Total Earned: <span id="total-earned">0</span> coins</p>
+                    <p class="text-sm text-gray-400 mt-2">Referrals: <span id="referral-count">0</span></p>
+                </div>
+                
+                <div class="support-section p-4 rounded-lg">
+                    <h3 class="font-semibold mb-3 text-yellow-300 flex items-center">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 mr-2"></i> Any Issue Contact Us
+                    </h3>
+                    <p class="text-sm text-gray-300 mb-4">Having problems or need assistance? Join our support group for help.</p>
+                    <a href="https://t.me/Earnovasupport" target="_blank" class="block w-full p-3 rounded-lg bg-yellow-600 text-white font-bold text-center hover:bg-yellow-700 transition-colors">
+                        Join Support Group
+                    </a>
+                </div>
+                
+                <button id="logout-btn" class="w-full mt-6 p-3 rounded-lg bg-red-600 text-white font-bold">Logout</button>
+            </div>
+
+            <div id="notifications-page" class="p-4 space-y-4 sub-page">
+                <h2 class="text-xl font-bold text-center">Notifications</h2>
+                <div id="notifications-list" class="space-y-3"></div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav sticky bottom-0 grid grid-cols-5 items-center text-center py-2 card-bg">
+            <a href="#" class="nav-link flex flex-col items-center" data-page="home-page">
+                <i data-lucide="home" class="w-5 h-5 mb-1"></i>
+                <span class="text-xs">Home</span>
+            </a>
+            <a href="#" class="nav-link flex flex-col items-center" data-page="offers-page">
+                <i class="fas fa-tasks w-5 h-5 mb-1"></i>
+                <span class="text-xs">Offers</span>
+            </a>
+            <a href="#" class="nav-link flex flex-col items-center" data-page="wallet-page">
+                <i data-lucide="wallet" class="w-5 h-5 mb-1"></i>
+                <span class="text-xs">Wallet</span>
+            </a>
+            <a href="#" class="nav-link flex flex-col items-center" data-page="refer-page">
+                <i data-lucide="users" class="w-5 h-5 mb-1"></i>
+                <span class="text-xs">Refer</span>
+            </a>
+            <a href="#" class="nav-link flex flex-col items-center" data-page="profile-page">
+                <i data-lucide="user" class="w-5 h-5 mb-1"></i>
+                <span class="text-xs">Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <div id="custom-alert" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-sm text-center">
+            <p id="alert-message" class="mb-4"></p>
+            <button id="alert-ok-btn" class="btn-accent px-6 py-2 rounded-lg">OK</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrGYsEibzOPVAydZ3Vpz78R2LpvOcjXcw",
+            authDomain: "earnovacash.firebaseapp.com",
+            databaseURL: "https://earnovacash-default-rtdb.firebaseio.com",
+            projectId: "earnovacash",
+            storageBucket: "earnovacash.firebasestorage.app",
+            messagingSenderId: "447071605000",
+            appId: "1:447071605000:web:2b2005e01ed1904d911cbd"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let userData = null;
+        let appConfig = {};
+        
+        // Color Match Challenge Game Variables
+        let colorMatchGame = {
+            gridSize: 4,
+            tileTypes: 4,
+            score: 0,
+            coins: 0,
+            timeLeft: 60,
+            gameActive: false,
+            gameTimer: null,
+            selectedTiles: [],
+            tiles: [],
+            soundEnabled: true
+        };
+
+        const loader = document.getElementById('loader');
+        const coinBalanceEl = document.getElementById('coin-balance');
+        const walletCoinBalanceEl = document.getElementById('wallet-coin-balance');
+        const profileNameEl = document.getElementById('profile-name');
+        const profileEmailEl = document.getElementById('profile-email');
+        const userInitialsEl = document.getElementById('user-initials');
+        const referralCodeEl = document.getElementById('referral-code');
+        const referralLinkEl = document.getElementById('referral-link');
+        const minWithdrawalInfoEl = document.getElementById('min-withdrawal-info');
+        const coinValueInfoEl = document.getElementById('coin-value-info');
+        const notificationDot = document.getElementById('notification-dot');
+        const withdrawalsTodayEl = document.getElementById('withdrawals-today');
+        const joinDateEl = document.getElementById('join-date');
+        const totalEarnedEl = document.getElementById('total-earned');
+        const referralCountEl = document.getElementById('referral-count');
+        const adLoading = document.getElementById('ad-loading');
+        const completeOfferBtn = document.getElementById('complete-offer-btn');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                lucide.createIcons();
+                setupEventListeners();
+                setupColorMatchGameEventListeners();
+                showMainPage('auth-section');
+                hideLoader();
+                
+                // Set up auth state listener
+                auth.onAuthStateChanged(handleAuthStateChange);
+            } catch (error) {
+                console.error("Initialization error:", error);
+                showAlert("Error initializing app. Please refresh the page.");
+                hideLoader();
+            }
+        });
+
+        function hideLoader() {
+            if (loader) loader.style.display = 'none';
+        }
+
+        function showLoader() {
+            if (loader) loader.style.display = 'flex';
+        }
+
+        function showAdLoading() {
+            if (adLoading) adLoading.style.display = 'flex';
+        }
+
+        function hideAdLoading() {
+            if (adLoading) adLoading.style.display = 'none';
+        }
+
+        async function handleAuthStateChange(user) {
+            try {
+                if (user) {
+                    showLoader();
+                    currentUser = user;
+                    await fetchUserData();
+                    
+                    if (userData && userData.isBlocked) {
+                        showAlert("Your account has been blocked.");
+                        await auth.signOut();
+                        hideLoader();
+                        return;
+                    }
+                    
+                    await fetchAppConfig();
+                    await checkNewNotifications();
+                    updateUI();
+                    showMainPage('app-container');
+                    navigateTo('home-page');
+                } else {
+                    currentUser = null;
+                    userData = null;
+                    showMainPage('auth-section');
+                }
+            } catch (error) {
+                console.error("Auth state change error:", error);
+                showAlert("Authentication error. Please try again.");
+            } finally {
+                hideLoader();
+            }
+        }
+
+        async function fetchUserData() {
+            if (!currentUser) return;
+            
+            const userRef = db.collection("users").doc(currentUser.uid);
+            try {
+                const userSnap = await userRef.get();
+                if (userSnap.exists) {
+                    userData = userSnap.data();
+                } else {
+                    const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                    const name = document.getElementById('signup-name')?.value || currentUser.email.split('@')[0];
+                    
+                    const defaultUserData = {
+                        uid: currentUser.uid,
+                        name: name,
+                        email: currentUser.email,
+                        balance: 100,
+                        referralCode: ownReferralCode,
+                        referredBy: null,
+                        lastNotificationCheck: new Date(),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        dailyAdCount: 0,
+                        lastAdWatchDate: new Date().toISOString().split('T')[0],
+                        isBlocked: false,
+                        withdrawalsToday: 0,
+                        lastWithdrawalDate: new Date().toISOString().split('T')[0],
+                        totalEarned: 0,
+                        referralCount: 0,
+                        completedTasks: []
+                    };
+                    
+                    await userRef.set(defaultUserData);
+                    userData = defaultUserData;
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                throw error;
+            }
+        }
+
+        async function fetchAppConfig() {
+            const configRef = db.collection("config").doc("main");
+            try {
+                const configSnap = await configRef.get();
+                appConfig = configSnap.exists ? configSnap.data() : {
+                    minWithdrawal: 5000,
+                    paymentMethods: ["UPI", "Paytm", "Binance", "Bank Transfer"],
+                    coinValueCoins: 1000,
+                    coinValueInr: 10,
+                    referralReward: 3000
+                };
+            } catch (error) {
+                console.error("Error fetching app config:", error);
+                // Use default config if there's an error
+                appConfig = {
+                    minWithdrawal: 5000,
+                    paymentMethods: ["UPI", "Paytm", "Binance", "Bank Transfer"],
+                    coinValueCoins: 1000,
+                    coinValueInr: 10,
+                    referralReward: 3000
+                };
+            }
+        }
+
+        function updateUI() {
+            if (!userData) return;
+            
+            try {
+                const balance = userData.balance || 0;
+                if (coinBalanceEl) coinBalanceEl.textContent = balance.toLocaleString();
+                if (walletCoinBalanceEl) walletCoinBalanceEl.textContent = balance.toLocaleString();
+                
+                if (profileNameEl) profileNameEl.textContent = userData.name || 'No Name';
+                if (profileEmailEl) profileEmailEl.textContent = userData.email || 'No Email';
+                
+                // Set user initials
+                const initials = userData.name ? userData.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'UN';
+                if (userInitialsEl) userInitialsEl.textContent = initials;
+                
+                if (referralCodeEl) referralCodeEl.textContent = userData.referralCode || '--';
+                // Update referral link to point to Telegram bot
+                if (referralLinkEl) referralLinkEl.textContent = `t.me/EarnovaCash_bot?start=ref_${userData.referralCode || '--'}`;
+                
+                if (minWithdrawalInfoEl) minWithdrawalInfoEl.textContent = `${appConfig.minWithdrawal || 5000}`;
+                if (coinValueInfoEl) coinValueInfoEl.textContent = `${appConfig.coinValueCoins || 1000} Coins = ₹${appConfig.coinValueInr || 10}`;
+                
+                // Format and display join date
+                if (joinDateEl) {
+                    if (userData.createdAt) {
+                        const joinDate = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
+                        joinDateEl.textContent = joinDate.toLocaleDateString();
+                    } else {
+                        joinDateEl.textContent = 'N/A';
+                    }
+                }
+                
+                if (totalEarnedEl) totalEarnedEl.textContent = userData.totalEarned || 0;
+                if (referralCountEl) referralCountEl.textContent = userData.referralCount || 0;
+                
+                // Update withdrawals today
+                const today = new Date().toISOString().split('T')[0];
+                if (userData.lastWithdrawalDate !== today) {
+                    userData.withdrawalsToday = 0;
+                    userData.lastWithdrawalDate = today;
+                }
+                if (withdrawalsTodayEl) withdrawalsTodayEl.textContent = userData.withdrawalsToday || 0;
+                
+                // Update withdrawal history
+                loadWithdrawalHistory();
+            } catch (error) {
+                console.error("Error updating UI:", error);
+            }
+        }
+
+        function showMainPage(pageId) {
+            document.querySelectorAll('.main-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(pageId);
+            if (page) page.classList.add('active');
+        }
+
+        function navigateTo(pageId) {
+            document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(pageId);
+            if (page) page.classList.add('active');
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active', 'text-accent');
+                if (link.dataset.page === pageId) link.classList.add('active', 'text-accent');
+            });
+            
+            // Load specific data when navigating to certain pages
+            if (pageId === 'wallet-page') loadWithdrawalHistory();
+            if (pageId === 'notifications-page') loadNotifications();
+            if (pageId === 'game-page') initColorMatchGame();
+        }
+
+        window.navigateTo = navigateTo;
+
+        function setupEventListeners() {
+            // Auth event listeners
+            document.getElementById('show-signup').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('signup-view').classList.remove('hidden');
+            });
+            
+            document.getElementById('show-login').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('signup-view').classList.add('hidden');
+                document.getElementById('login-view').classList.remove('hidden');
+            });
+            
+            document.getElementById('signup-btn').addEventListener('click', handleSignup);
+            document.getElementById('login-btn').addEventListener('click', handleLogin);
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
+            
+            // Navigation event listeners
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.dataset.page;
+                    navigateTo(pageId);
+                });
+            });
+            
+            document.getElementById('notification-bell').addEventListener('click', () => {
+                navigateTo('notifications-page');
+            });
+            
+            // Referral event listeners
+            document.getElementById('copy-code-btn').addEventListener('click', copyReferralCode);
+            document.getElementById('copy-link-btn').addEventListener('click', copyReferralLink);
+            document.getElementById('share-btn').addEventListener('click', shareReferralCode);
+            
+            // Wallet event listeners
+            document.getElementById('withdraw-btn').addEventListener('click', handleWithdrawal);
+            document.getElementById('home-withdraw-btn').addEventListener('click', () => navigateTo('wallet-page'));
+            document.getElementById('apply-referral-btn').addEventListener('click', handleApplyReferralCode);
+            
+            // Alert OK button
+            document.getElementById('alert-ok-btn').addEventListener('click', () => {
+                document.getElementById('custom-alert').classList.add('hidden');
+            });
+            
+            // Withdrawal method selection
+            document.querySelectorAll('.method-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove selected class from all options
+                    document.querySelectorAll('.method-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    option.classList.add('selected');
+                    
+                    // Set the selected method
+                    const method = option.dataset.method;
+                    document.getElementById('selected-method').value = method;
+                    
+                    // Hide all payment details
+                    document.querySelectorAll('.payment-details').forEach(detail => {
+                        detail.classList.remove('active');
+                    });
+                    
+                    // Show the appropriate payment details
+                    if (method === 'UPI') {
+                        document.getElementById('upi-details').classList.add('active');
+                    } else if (method === 'Paytm') {
+                        document.getElementById('paytm-details').classList.add('active');
+                    } else if (method === 'Binance') {
+                        document.getElementById('binance-details').classList.add('active');
+                    } else if (method === 'Bank Transfer') {
+                        document.getElementById('bank-transfer-details').classList.add('active');
+                    }
+                });
+            });
+            
+            // Complete Offer button event listener
+            if (completeOfferBtn) {
+                completeOfferBtn.addEventListener('click', function() {
+                    navigateTo('offers-page');
+                });
+            }
+        }
+
+        // Color Match Challenge Game Functions
+        function setupColorMatchGameEventListeners() {
+            document.getElementById('color-match-start-btn').addEventListener('click', startColorMatchGame);
+            document.getElementById('color-match-hint-btn').addEventListener('click', provideColorMatchHint);
+            document.getElementById('color-match-restart-btn').addEventListener('click', startColorMatchGame);
+            document.getElementById('color-match-play-again-btn').addEventListener('click', startColorMatchGame);
+        }
+
+        function initColorMatchGame() {
+            initializeColorMatchGrid();
+        }
+
+        function initializeColorMatchGrid() {
+            const gameGrid = document.getElementById('color-match-grid');
+            gameGrid.innerHTML = '';
+            colorMatchGame.tiles = [];
+            const tileCount = colorMatchGame.gridSize * colorMatchGame.gridSize;
+            let tileArray = [];
+            
+            for (let i = 0; i < colorMatchGame.tileTypes; i++) {
+                for (let j = 0; j < tileCount / colorMatchGame.tileTypes; j++) {
+                    tileArray.push(i);
+                }
+            }
+            
+            tileArray = shuffleArray(tileArray);
+            
+            for (let i = 0; i < tileCount; i++) {
+                const tile = document.createElement('div');
+                tile.classList.add('color-match-tile');
+                tile.dataset.index = i;
+                const type = tileArray[i];
+                tile.dataset.type = type;
+                
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9c74f'];
+                tile.style.backgroundColor = colors[type];
+                
+                const emojis = ['🔴', '🔵', '🟢', '🟡'];
+                tile.textContent = emojis[type];
+                
+                tile.addEventListener('click', () => selectColorMatchTile(i));
+                gameGrid.appendChild(tile);
+                colorMatchGame.tiles.push(tile);
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function selectColorMatchTile(index) {
+            if (!colorMatchGame.gameActive || 
+                colorMatchGame.tiles[index].classList.contains('matched') || 
+                colorMatchGame.selectedTiles.length >= 2) return;
+                
+            const tile = colorMatchGame.tiles[index];
+            
+            if (colorMatchGame.selectedTiles.includes(index)) {
+                colorMatchGame.selectedTiles = colorMatchGame.selectedTiles.filter(i => i !== index);
+                tile.classList.remove('selected');
+                return;
+            }
+            
+            colorMatchGame.selectedTiles.push(index);
+            tile.classList.add('selected');
+            
+            if (colorMatchGame.selectedTiles.length === 2) {
+                setTimeout(checkColorMatch, 200);
+            }
+        }
+
+        function checkColorMatch() {
+            const [index1, index2] = colorMatchGame.selectedTiles;
+            const tile1 = colorMatchGame.tiles[index1];
+            const tile2 = colorMatchGame.tiles[index2];
+            
+            if (tile1.dataset.type === tile2.dataset.type) {
+                colorMatchGame.score += 100;
+                if (Math.random() > 0.5) colorMatchGame.coins += 10;
+                colorMatchGame.timeLeft += 5;
+                
+                tile1.classList.add('matched');
+                tile2.classList.add('matched');
+                
+                updateColorMatchStats();
+                checkColorMatchGameWin();
+            } else {
+                setTimeout(() => {
+                    tile1.classList.remove('selected');
+                    tile2.classList.remove('selected');
+                }, 500);
+            }
+            
+            colorMatchGame.selectedTiles = [];
+        }
+        
+        function updateColorMatchStats() {
+            document.getElementById('color-match-score').textContent = colorMatchGame.score;
+            document.getElementById('color-match-coins').textContent = colorMatchGame.coins;
+            document.getElementById('color-match-time').textContent = colorMatchGame.timeLeft;
+        }
+
+        function checkColorMatchGameWin() {
+            const allMatched = colorMatchGame.tiles.every(tile => tile.classList.contains('matched'));
+            if (allMatched) {
+                colorMatchGame.score += 500;
+                colorMatchGame.coins += 50;
+                updateColorMatchStats();
+                
+                setTimeout(() => {
+                    showAlert("Congratulations! Next Level!");
+                    initializeColorMatchGrid();
+                }, 1000);
+            }
+        }
+
+        function startColorMatchGame() {
+            colorMatchGame.score = 0;
+            colorMatchGame.coins = 0;
+            colorMatchGame.timeLeft = 60;
+            colorMatchGame.gameActive = true;
+            colorMatchGame.selectedTiles = [];
+            
+            updateColorMatchStats();
+            document.getElementById('color-match-game-over').style.display = 'none';
+            initializeColorMatchGrid();
+            
+            clearInterval(colorMatchGame.gameTimer);
+            
+            colorMatchGame.gameTimer = setInterval(() => {
+                colorMatchGame.timeLeft--;
+                document.getElementById('color-match-time').textContent = colorMatchGame.timeLeft;
+                
+                if (colorMatchGame.timeLeft <= 0) {
+                    endColorMatchGame();
+                }
+            }, 1000);
+        }
+
+        function endColorMatchGame() {
+            colorMatchGame.gameActive = false;
+            clearInterval(colorMatchGame.gameTimer);
+            
+            document.getElementById('color-match-final-score').textContent = colorMatchGame.score;
+            document.getElementById('color-match-final-coins').textContent = colorMatchGame.coins;
+            document.getElementById('color-match-final-time').textContent = colorMatchGame.timeLeft > 0 ? colorMatchGame.timeLeft : 0;
+            document.getElementById('color-match-game-over').style.display = 'flex';
+            
+            // Add coins to user's balance
+            if (colorMatchGame.coins > 0 && currentUser) {
+                updateBalance(colorMatchGame.coins);
+                showAlert(`Congratulations! You earned ${colorMatchGame.coins} coins from the game.`);
+            }
+        }
+
+        function provideColorMatchHint() {
+            if (!colorMatchGame.gameActive) return;
+            
+            // Find two matching, non-matched tiles and highlight them
+            for (let i = 0; i < colorMatchGame.tiles.length; i++) {
+                for (let j = i + 1; j < colorMatchGame.tiles.length; j++) {
+                    if (colorMatchGame.tiles[i].dataset.type === colorMatchGame.tiles[j].dataset.type &&
+                        !colorMatchGame.tiles[i].classList.contains('matched')) {
+                        colorMatchGame.tiles[i].classList.add('selected');
+                        colorMatchGame.tiles[j].classList.add('selected');
+                        
+                        setTimeout(() => {
+                            colorMatchGame.tiles[i].classList.remove('selected');
+                            colorMatchGame.tiles[j].classList.remove('selected');
+                        }, 1000);
+                        
+                        return;
+                    }
+                }
+            }
+        }
+
+        async function handleSignup() {
+            try {
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const referralCode = document.getElementById('signup-referral').value.trim().toUpperCase();
+                
+                // Clear previous errors
+                clearErrors();
+                
+                // Validate inputs
+                if (!name) {
+                    showError('signup-name-error', 'Name is required');
+                    return;
+                }
+                
+                if (!email) {
+                    showError('signup-email-error', 'Email is required');
+                    return;
+                }
+                
+                if (!password || password.length < 6) {
+                    showError('signup-password-error', 'Password must be at least 6 characters');
+                    return;
+                }
+                
+                showLoader();
+                
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                
+                // Apply referral code if provided
+                if (referralCode) {
+                    await applyReferralBonus(referralCode, false);
+                }
+            } catch (error) {
+                console.error("Signup error:", error);
+                showAlert(error.message);
+                hideLoader();
+            }
+        }
+
+        async function handleLogin() {
+            try {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                // Clear previous errors
+                clearErrors();
+                
+                if (!email) {
+                    showError('login-email-error', 'Email is required');
+                    return;
+                }
+                
+                if (!password) {
+                    showError('login-password-error', 'Password is required');
+                    return;
+                }
+                
+                showLoader();
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                console.error("Login error:", error);
+                showAlert(error.message);
+                hideLoader();
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await auth.signOut();
+            } catch (error) {
+                console.error("Logout error:", error);
+                showAlert("Error signing out. Please try again.");
+            }
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+        }
+
+        async function checkNewNotifications() {
+            if (!userData || !userData.lastNotificationCheck) return;
+            
+            try {
+                const lastCheck = userData.lastNotificationCheck;
+                const notificationsRef = db.collection("notifications");
+                const q = notificationsRef.where("createdAt", ">", lastCheck).limit(1);
+                const querySnapshot = await q.get();
+                
+                notificationDot.style.display = querySnapshot.empty ? 'none' : 'block';
+            } catch (error) {
+                console.error("Error checking notifications:", error);
+            }
+        }
+
+        async function loadNotifications() {
+            const listEl = document.getElementById('notifications-list');
+            if (!listEl) return;
+            
+            listEl.innerHTML = '<p class="text-gray-400">Loading...</p>';
+            notificationDot.style.display = 'none';
+            
+            try {
+                const q = db.collection("notifications").orderBy("createdAt", "desc").limit(10);
+                const querySnapshot = await q.get();
+                
+                if (querySnapshot.empty) {
+                    listEl.innerHTML = '<p class="text-gray-400 text-center">No notifications yet.</p>';
+                    return;
+                }
+                
+                listEl.innerHTML = '';
+                querySnapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const date = msg.createdAt ? msg.createdAt.toDate().toLocaleDateString() : 'N/A';
+                    
+                    listEl.innerHTML += `
+                        <div class="card-bg p-4 rounded-lg">
+                            <div class="flex justify-between items-center mb-1">
+                                <h3 class="font-bold">${msg.title || 'Notification'}</h3>
+                                <p class="text-xs text-gray-400">${date}</p>
+                            </div>
+                            <p class="text-sm text-gray-300">${msg.message || ''}</p>
+                        </div>`;
+                });
+                
+                // Update last notification check time
+                if (currentUser) {
+                    await db.collection("users").doc(currentUser.uid).update({
+                        lastNotificationCheck: new Date()
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading notifications:", error);
+                listEl.innerHTML = '<p class="text-red-400">Error loading notifications.</p>';
+            }
+        }
+
+        async function loadWithdrawalHistory() {
+            const historyList = document.getElementById('withdrawal-history-list');
+            if (!historyList) return;
+            
+            historyList.innerHTML = '<p class="text-gray-400">Loading history...</p>';
+            
+            try {
+                if (!currentUser) {
+                    historyList.innerHTML = '<p class="text-gray-400 text-center py-4">Please log in to view history.</p>';
+                    return;
+                }
+                
+                const q = db.collection("withdrawals")
+                    .where("userId", "==", currentUser.uid)
+                    .orderBy("requestedAt", "desc");
+                
+                const querySnapshot = await q.get();
+                
+                if (querySnapshot.empty) {
+                    historyList.innerHTML = '<p class="text-gray-400 text-center py-4">No withdrawal history yet.</p>';
+                    return;
+                }
+                
+                historyList.innerHTML = '';
+                querySnapshot.forEach(doc => {
+                    const request = doc.data();
+                    const status = request.status || 'pending';
+                    let statusColor = 'withdrawal-status-pending';
+                    
+                    if (status === 'approved') statusColor = 'withdrawal-status-approved';
+                    else if (status === 'rejected') statusColor = 'withdrawal-status-rejected';
+                    
+                    const date = request.requestedAt ? request.requestedAt.toDate().toLocaleDateString() : 'N/A';
+                    const time = request.requestedAt ? request.requestedAt.toDate().toLocaleTimeString() : 'N/A';
+                    
+                    historyList.innerHTML += `
+                        <div class="card-bg p-3 rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="font-semibold">${request.amount} Coins - ${request.method}</p>
+                                <p class="font-bold ${statusColor} capitalize">${status}</p>
+                            </div>
+                            <p class="text-xs text-gray-400">Requested: ${date} at ${time}</p>
+                            ${request.processedAt ? `<p class="text-xs text-gray-400 mt-1">Processed: ${request.processedAt.toDate().toLocaleDateString()} at ${request.processedAt.toDate().toLocaleTimeString()}</p>` : ''}
+                            ${request.note ? `<p class="text-xs text-gray-400 mt-1">Note: ${request.note}</p>` : ''}
+                        </div>`;
+                });
+            } catch (error) {
+                console.error("Error fetching withdrawal history: ", error);
+                historyList.innerHTML = '<p class="text-gray-400 text-center py-4">No withdrawal history yet.</p>';
+            }
+        }
+
+        async function handleApplyReferralCode() {
+            if (userData && userData.referredBy) {
+                showAlert("You've already used a referral code.");
+                return;
+            }
+            
+            const codeInput = document.getElementById('enter-referral-code');
+            const code = codeInput.value.trim().toUpperCase();
+            
+            if (!code) {
+                showError('referral-code-error', "Please enter a referral code.");
+                return;
+            }
+            
+            if (userData && code === userData.referralCode) {
+                showError('referral-code-error', "You cannot use your own code.");
+                return;
+            }
+            
+            showLoader();
+            await applyReferralBonus(code, true);
+            codeInput.value = '';
+            hideLoader();
+        }
+
+        async function applyReferralBonus(referrerCode, isManualApply = false) {
+            try {
+                const usersRef = db.collection("users");
+                const q = usersRef.where("referralCode", "==", referrerCode);
+                const querySnapshot = await q.get();
+                
+                if (querySnapshot.empty) {
+                    if (isManualApply) showAlert("Invalid referral code.");
+                    return;
+                }
+                
+                const referrerDoc = querySnapshot.docs[0];
+                const referrerRef = db.collection("users").doc(referrerDoc.id);
+                const referrerData = referrerDoc.data();
+                
+                // Update referrer's balance and referral count
+                await referrerRef.update({
+                    balance: firebase.firestore.FieldValue.increment(3000),
+                    referralCount: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                // Update current user's balance and mark as referred
+                const newUserRef = db.collection("users").doc(currentUser.uid);
+                await newUserRef.update({
+                    balance: firebase.firestore.FieldValue.increment(3000),
+                    referredBy: referrerCode
+                });
+                
+                // Update local data
+                userData.balance += 3000;
+                userData.referredBy = referrerCode;
+                updateUI();
+                
+                if (isManualApply) {
+                    showAlert("Referral code applied successfully! You received 3000 coins.");
+                }
+            } catch(error) {
+                console.error("Error applying referral bonus: ", error);
+                if (isManualApply) showAlert("Error applying referral code.");
+            }
+        }
+
+        async function updateBalance(amount) {
+            if (!currentUser) return;
+            
+            const newBalance = (userData.balance || 0) + amount;
+            const userRef = db.collection("users").doc(currentUser.uid);
+            
+            await userRef.update({
+                balance: newBalance,
+                totalEarned: firebase.firestore.FieldValue.increment(amount > 0 ? amount : 0)
+            });
+            
+            userData.balance = newBalance;
+            if (amount > 0) {
+                userData.totalEarned = (userData.totalEarned || 0) + amount;
+            }
+            
+            updateUI();
+        }
+
+        async function handleWithdrawal() {
+            try {
+                const amount = parseInt(document.getElementById('withdraw-amount').value);
+                const method = document.getElementById('selected-method').value;
+                const minWithdrawal = appConfig.minWithdrawal || 5000;
+                const today = new Date().toISOString().split('T')[0];
+                
+                // Reset daily count if it's a new day
+                if (userData.lastWithdrawalDate !== today) {
+                    userData.withdrawalsToday = 0;
+                    userData.lastWithdrawalDate = today;
+                }
+                
+                // Clear previous errors
+                clearErrors();
+                
+                if (!amount || amount <= 0) {
+                    showError('withdraw-amount-error', "Please enter a valid amount.");
+                    return;
+                }
+                
+                if (amount < minWithdrawal) {
+                    showError('withdraw-amount-error', `Minimum withdrawal is ${minWithdrawal} coins.`);
+                    return;
+                }
+                
+                if (amount > userData.balance) {
+                    showError('withdraw-amount-error', "Insufficient balance.");
+                    return;
+                }
+                
+                if (userData.withdrawalsToday >= 3) {
+                    showError('withdraw-amount-error', "Daily withdrawal limit reached (3 per day).");
+                    return;
+                }
+                
+                if (!method) {
+                    showError('withdraw-method-error', "Please select a withdrawal method.");
+                    return;
+                }
+                
+                let paymentDetail = '';
+                
+                // Validate and get payment details based on method
+                if (method === 'UPI') {
+                    const upiId = document.getElementById('upi-id').value.trim();
+                    if (!upiId) {
+                        showError('upi-id-error', "Please enter your UPI ID.");
+                        return;
+                    }
+                    paymentDetail = upiId;
+                } else if (method === 'Paytm') {
+                    const paytmNumber = document.getElementById('paytm-number').value.trim();
+                    if (!paytmNumber) {
+                        showError('paytm-number-error', "Please enter your Paytm number.");
+                        return;
+                    }
+                    paymentDetail = paytmNumber;
+                } else if (method === 'Binance') {
+                    const binanceId = document.getElementById('binance-id').value.trim();
+                    if (!binanceId) {
+                        showError('binance-id-error', "Please enter your Binance ID.");
+                        return;
+                    }
+                    paymentDetail = binanceId;
+                } else if (method === 'Bank Transfer') {
+                    const accountHolder = document.getElementById('account-holder').value.trim();
+                    const accountNumber = document.getElementById('account-number').value.trim();
+                    const ifscCode = document.getElementById('ifsc-code').value.trim();
+                    
+                    if (!accountHolder) {
+                        showError('account-holder-error', "Please enter account holder name.");
+                        return;
+                    }
+                    
+                    if (!accountNumber || accountNumber.length < 9) {
+                        showError('account-number-error', "Please enter a valid account number.");
+                        return;
+                    }
+                    
+                    if (!ifscCode || ifscCode.length !== 11) {
+                        showError('ifsc-code-error', "Please enter a valid IFSC code.");
+                        return;
+                    }
+                    
+                    paymentDetail = `Account Holder: ${accountHolder}, Account Number: ${accountNumber}, IFSC: ${ifscCode}`;
+                }
+                
+                showLoader();
+                
+                // Deduct amount from balance
+                await updateBalance(-amount);
+                
+                // Increment daily withdrawal count
+                userData.withdrawalsToday += 1;
+                await db.collection("users").doc(currentUser.uid).update({
+                    withdrawalsToday: userData.withdrawalsToday,
+                    lastWithdrawalDate: today
+                });
+                
+                // Create withdrawal request
+                await db.collection("withdrawals").add({
+                    userId: currentUser.uid,
+                    userName: userData.name,
+                    userEmail: userData.email,
+                    amount: amount,
+                    method: method,
+                    paymentDetail: paymentDetail,
+                    status: "pending",
+                    requestedAt: new Date()
+                });
+                
+                showAlert("Withdrawal request submitted successfully!");
+                
+                document.getElementById('withdraw-amount').value = '';
+                // Clear payment details
+                document.getElementById('upi-id').value = '';
+                document.getElementById('paytm-number').value = '';
+                document.getElementById('binance-id').value = '';
+                document.getElementById('account-holder').value = '';
+                document.getElementById('account-number').value = '';
+                document.getElementById('ifsc-code').value = '';
+                
+                // Update UI
+                if (withdrawalsTodayEl) withdrawalsTodayEl.textContent = userData.withdrawalsToday;
+                
+                // Reload withdrawal history
+                loadWithdrawalHistory();
+            } catch (error) {
+                console.error("Withdrawal error:", error);
+                showAlert("Error submitting request: " + error.message);
+                
+                // Refund the amount in case of error
+                if (currentUser && userData) {
+                    await updateBalance(parseInt(document.getElementById('withdraw-amount').value));
+                }
+            } finally {
+                hideLoader();
+            }
+        }
+
+        function copyReferralCode() {
+            const textToCopy = referralCodeEl.textContent;
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    showAlert("Referral code copied!");
+                })
+                .catch(err => {
+                    showAlert("Failed to copy code.");
+                });
+        }
+
+        function copyReferralLink() {
+            const textToCopy = `t.me/EarnovaCash_bot?start=ref_${userData.referralCode}`;
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    showAlert("Referral link copied!");
+                })
+                .catch(err => {
+                    showAlert("Failed to copy link.");
+                });
+        }
+
+        function shareReferralCode() {
+            const text = `Join EarnOva and start earning rewards! Use my referral link: t.me/EarnovaCash_bot?start=ref_${userData.referralCode}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join EarnOva!',
+                    text: text
+                }).catch((error) => {
+                    console.error("Share failed:", error);
+                    copyReferralLink();
+                });
+            } else {
+                copyReferralLink();
+            }
+        }
+
+        // Task completion function - UPDATED
+        window.completeTask = async function(taskType) {
+            if (typeof window.show_9798556 !== 'function') {
+                showAlert("Task service is not available. Please try again later.");
+                return;
+            }
+            
+            // Check if user has already completed this task
+            if (userData.completedTasks && userData.completedTasks.includes(taskType)) {
+                showAlert("You have already completed this task.");
+                return;
+            }
+            
+            let rewardAmount = 0;
+            let taskName = "";
+            let telegramLink = "";
+            
+            switch(taskType) {
+                case 'official': // NEW TASK
+                    rewardAmount = 500;
+                    taskName = "Earnova Official";
+                    telegramLink = "https://t.me/earnovacash";
+                    break;
+                case 'partner1':
+                    rewardAmount = 100;
+                    taskName = "Partner 1";
+                    telegramLink = "https://t.me/moneycreeper"; // UPDATED LINK
+                    break;
+                case 'partner2':
+                    rewardAmount = 200;
+                    taskName = "Partner 2";
+                    telegramLink = "https://t.me/cshloop"; // UPDATED LINK
+                    break;
+                default:
+                    return;
+            }
+            
+            // Open Telegram channel in new tab
+            window.open(telegramLink, '_blank');
+            
+            // Show the ad before completing the task
+            try {
+                await window.show_9798556();
+                
+                // Update user's balance and mark task as completed
+                await updateBalance(rewardAmount);
+                
+                // Add task to completed tasks
+                const userRef = db.collection("users").doc(currentUser.uid);
+                const updatedTasks = userData.completedTasks ? [...userData.completedTasks, taskType] : [taskType];
+                await userRef.update({
+                    completedTasks: updatedTasks
+                });
+                
+                userData.completedTasks = updatedTasks;
+                
+                showAlert(`Congratulations! You earned ${rewardAmount} coins for ${taskName}.`);
+            } catch(e) {
+                console.error("Task error:", e);
+                showAlert('Task could not be completed. Please try again later.');
+            }
+        }
+
+        window.claimReward = async function(taskType) {
+            // No ad limits - user can watch unlimited ads
+            if (typeof window.show_9798556 !== 'function') {
+                showAlert("Ad service is not available. Please try again later.");
+                hideAdLoading();
+                return;
+            }
+            
+            try {
+                let adPromise;
+                
+                switch(taskType) {
+                    case 'interstitial':
+                        adPromise = window.show_9798556();
+                        break;
+                    case 'popup':
+                        adPromise = window.show_9798556('pop');
+                        break;
+                    case 'inApp':
+                        adPromise = window.show_9798556({ type: 'inApp' });
+                        break;
+                    case 'miniApp':
+                        adPromise = window.show_9798556();
+                        break;
+                }
+                
+                await adPromise;
+                
+                // Determine reward amount based on task type
+                let rewardAmount = 0;
+                switch(taskType) {
+                    case 'interstitial':
+                        rewardAmount = 50;
+                        break;
+                    case 'popup':
+                        rewardAmount = 50;
+                        break;
+                    case 'inApp':
+                        rewardAmount = 50;
+                        break;
+                    case 'miniApp':
+                        rewardAmount = 50;
+                        break;
+                }
+                
+                if (rewardAmount > 0) {
+                    await updateBalance(rewardAmount);
+                    showAlert(`Congratulations! You earned ${rewardAmount} coins.`);
+                }
+            } catch(e) {
+                console.error("Ad error:", e);
+                showAlert('Ad could not be displayed. Please try again later.');
+            } finally {
+                hideAdLoading();
+            }
+        }
+
+        function showAlert(message) {
+            const alertElement = document.getElementById('custom-alert');
+            const messageElement = document.getElementById('alert-message');
+            
+            if (messageElement) messageElement.textContent = message;
+            if (alertElement) alertElement.classList.remove('hidden');
+        }
+
+        window.showAlert = showAlert;
+    </script>
+</body>
+</html>
