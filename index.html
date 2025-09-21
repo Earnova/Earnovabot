@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="monetag" content="0d0b6e2bc60f70eaf08ded1e1e451a95">
+<meta name="monetag" content="0d0b6e2bc60f70eaf08ded1e1e451a95">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EarnOva - Earn Rewards</title>
@@ -1287,8 +1287,8 @@
             
             if (tile1.dataset.type === tile2.dataset.type) {
                 colorMatchGame.score += 100;
-                if (Math.random() > 0.5) colorMatchGame.coins += 10;
-                colorMatchGame.timeLeft += 5;
+                if (Math.random() > 0.5) colorMatchGame.coins += 0;
+                colorMatchGame.timeLeft += 0;
                 
                 tile1.classList.add('matched');
                 tile2.classList.add('matched');
@@ -1315,7 +1315,7 @@
             const allMatched = colorMatchGame.tiles.every(tile => tile.classList.contains('matched'));
             if (allMatched) {
                 colorMatchGame.score += 500;
-                colorMatchGame.coins += 50;
+                colorMatchGame.coins += 25;
                 updateColorMatchStats();
                 
                 setTimeout(() => {
